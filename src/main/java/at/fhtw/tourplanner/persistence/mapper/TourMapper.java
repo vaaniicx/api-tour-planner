@@ -5,7 +5,7 @@ import at.fhtw.tourplanner.persistence.entity.TourEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {LocationMapper.class})
 public interface TourMapper {
 
     @Mapping(source = "from", target = "fromLocation")

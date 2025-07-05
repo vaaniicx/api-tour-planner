@@ -2,9 +2,11 @@ package at.fhtw.tourplanner.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tour {
@@ -14,7 +16,7 @@ public class Tour {
 
     private String description;
 
-    private String from;
+    private Location from;
 
-    private String to;
+    private Location to;
 }

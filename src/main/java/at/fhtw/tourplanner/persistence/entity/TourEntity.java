@@ -23,9 +23,11 @@ public class TourEntity {
 
     private String description;
 
-    private String fromLocation;
+    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private LocationEntity fromLocation;
 
-    private String toLocation;
+    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private LocationEntity toLocation;
 
     @OneToMany(mappedBy = "tour", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TourLogEntity> tourLogs = new ArrayList<>();

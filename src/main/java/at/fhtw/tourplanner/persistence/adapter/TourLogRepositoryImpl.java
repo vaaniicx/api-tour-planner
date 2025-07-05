@@ -18,7 +18,9 @@ import java.util.Optional;
 public class TourLogRepositoryImpl implements TourLogRepository {
 
     private final JpaTourLogRepository jpaTourLogRepository;
+
     private final JpaTourRepository jpaTourRepository;
+
     private final TourLogMapper tourLogMapper;
 
     @Override
@@ -53,8 +55,7 @@ public class TourLogRepositoryImpl implements TourLogRepository {
     }
 
     @Override
-    public void delete(TourLog tourLog) {
-        TourLogEntity tourLogEntity = tourLogMapper.toEntity(tourLog);
-        jpaTourLogRepository.delete(tourLogEntity);
+    public void delete(Long id) {
+        jpaTourLogRepository.deleteById(id);
     }
 }

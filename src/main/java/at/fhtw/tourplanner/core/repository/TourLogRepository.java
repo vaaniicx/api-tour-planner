@@ -15,5 +15,5 @@ public interface TourLogRepository {
 
     TourLog update(TourLog tourLog);
 
-    void delete(TourLog tourLog);
+    void delete(Long id);
 }

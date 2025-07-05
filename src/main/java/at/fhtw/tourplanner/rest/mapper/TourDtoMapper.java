@@ -7,7 +7,7 @@ import at.fhtw.tourplanner.rest.dto.tour.response.TourResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {LocationDtoMapper.class})
 public interface TourDtoMapper {
 
     TourResponse toResponse(Tour tour);

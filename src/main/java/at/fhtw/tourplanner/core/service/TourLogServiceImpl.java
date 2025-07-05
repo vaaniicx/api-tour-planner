@@ -53,8 +53,7 @@ public class TourLogServiceImpl implements TourLogService {
         log.info("Delete log with id={}", logId);
 
         findTourById(tourId);
-        TourLog logToBeDeleted = findTourLogById(logId);
-        tourLogRepository.delete(logToBeDeleted);
+        tourLogRepository.delete(logId);
     }
 
     private TourLog findTourLogById(Long logId) {

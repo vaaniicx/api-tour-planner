@@ -1,5 +1,6 @@
 package at.fhtw.tourplanner.rest.dto.tour.request;
 
+import at.fhtw.tourplanner.core.model.Location;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TourUpdateRequest {
+
     private String name;
+
     private String description;
-    private String from;
-    private String to;
+
+    private Location from;
+
+    private Location to;
 }

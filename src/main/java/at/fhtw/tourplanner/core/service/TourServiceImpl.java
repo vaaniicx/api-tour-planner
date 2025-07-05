@@ -16,6 +16,8 @@ public class TourServiceImpl implements TourService {
 
     private final TourRepository tourRepository;
 
+    private final LocationService locationService;
+
     @Override
     public List<Tour> getAllTours() {
         log.info("Get all tours");
@@ -32,11 +34,14 @@ public class TourServiceImpl implements TourService {
 
     @Override
     public Tour createTour(Tour tour) {
-        log.info("Create new tour with name={}", tour.getName());
+        log.info("Create new tour: {}", tour.toString());
 
         if (tour.getId() != null) {
             throw new IllegalArgumentException("New tours must not have an ID.");
         }
+
+        tour.setFrom(locationService.createLocation(tour.getFrom()));
+        tour.setTo(locationService.createLocation(tour.getTo()));
         return tourRepository.create(tour);
     }
 
@@ -46,6 +51,9 @@ public class TourServiceImpl implements TourService {
 
         Tour existingTour = getTourById(tourId);
         Tour updatedTour = new Tour(existingTour.getId(), tour.getName(), tour.getDescription(), tour.getFrom(), tour.getTo());
+
+        tour.setFrom(locationService.updateLocation(updatedTour.getFrom()));
+        tour.setTo(locationService.updateLocation(updatedTour.getTo()));
         return tourRepository.update(updatedTour);
     }
 
