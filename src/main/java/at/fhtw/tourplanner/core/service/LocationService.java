@@ -1,14 +1,23 @@
 package at.fhtw.tourplanner.core.service;
 
 import at.fhtw.tourplanner.core.model.Location;
+import at.fhtw.tourplanner.core.repository.LocationRepository;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
-public interface LocationService {
+@Slf4j
+@Service
+@AllArgsConstructor
+public class LocationService {
 
-    Location getLocationById(Long id);
+    private final LocationRepository locationRepository;
 
-    Location createLocation(Location location);
+    public Location createLocation(Location location) {
+        return locationRepository.create(location);
+    }
 
-    Location updateLocation(Location location);
-
-    void deleteLocation(Long id);
+    public Location updateLocation(Location location) {
+        return locationRepository.update(location);
+    }
 }

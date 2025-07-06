@@ -1,16 +1,80 @@
 package at.fhtw.tourplanner.core.service;
 
+import at.fhtw.tourplanner.core.model.Tour;
 import at.fhtw.tourplanner.core.model.TourLog;
+import at.fhtw.tourplanner.core.repository.TourLogRepository;
+import at.fhtw.tourplanner.core.repository.TourRepository;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
-public interface TourLogService {
+@Slf4j
+@Service
+@AllArgsConstructor
+public class TourLogService {
 
-    List<TourLog> getAllLogsForTour(Long tourId);
+    private final TourLogRepository tourLogRepository;
 
-    TourLog createLogForTour(Long tourId, TourLog tourLog);
+    private final TourRepository tourRepository;
 
-    TourLog updateLogForTour(Long tourId, TourLog tourLog);
+    public List<TourLog> getAllLogsForTour(Long tourId) {
+        log.info("Get all logs for tour with id={}", tourId);
 
-    void deleteLogForTour(Long tourId, Long logId);
+        return tourLogRepository.findByTourId(tourId);
+    }
+
+    public TourLog createLogForTour(Long tourId, TourLog tourLog) throws NoSuchElementException {
+        log.info("Create new log for tour with id={}", tourId);
+
+        if (tourLog.getId() != null) {
+            throw new IllegalArgumentException("New logs must not have an ID.");
+        }
+
+        Tour tour = findTourById(tourId);
+
+        tourLog.setTour(findTourById(tourId));
+        tourLog.setDistance(tour.getDistance());
+        tourLog.setDuration(tour.getDuration());
+
+        return tourLogRepository.create(tourLog);
+    }
+
+    public TourLog updateLogForTour(Long tourId, TourLog tourLog) throws NoSuchElementException {
+        log.info("Update log for tour with id={}", tourId);
+
+        TourLog existingTourLog = findTourLogById(tourLog.getId());
+
+        TourLog updatedTourLog = TourLog.builder()
+                .id(existingTourLog.getId())
+                .tour(existingTourLog.getTour())
+                .date(tourLog.getDate())
+                .comment(tourLog.getComment())
+                .difficulty(tourLog.getDifficulty())
+                .rating(tourLog.getRating())
+                .distance(existingTourLog.getDistance())
+                .duration(existingTourLog.getDuration())
+                .build();
+
+        return tourLogRepository.update(updatedTourLog);
+    }
+
+    public void deleteLogForTour(Long tourId, Long logId) {
+        log.info("Delete log with id={}", logId);
+
+        findTourById(tourId);
+        tourLogRepository.delete(logId);
+    }
+
+    private TourLog findTourLogById(Long logId) {
+        return tourLogRepository.findById(logId)
+                .orElseThrow(() -> new NoSuchElementException("Log not found."));
+    }
+
+    private Tour findTourById(Long tourId) {
+        return tourRepository.findById(tourId)
+                .orElseThrow(() -> new NoSuchElementException("Tour not found."));
+    }
 }
