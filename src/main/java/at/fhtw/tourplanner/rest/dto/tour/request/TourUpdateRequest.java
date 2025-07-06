@@ -17,4 +17,6 @@ public class TourUpdateRequest {
     private Location from;
 
     private Location to;
+
+    private String transportType;
 }

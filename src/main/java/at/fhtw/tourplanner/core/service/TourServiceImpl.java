@@ -2,6 +2,8 @@ package at.fhtw.tourplanner.core.service;
 
 import at.fhtw.tourplanner.core.model.Tour;
 import at.fhtw.tourplanner.core.repository.TourRepository;
+import at.fhtw.tourplanner.external.OpenRouteServiceClient;
+import at.fhtw.tourplanner.external.dto.RouteInformation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ public class TourServiceImpl implements TourService {
     private final TourRepository tourRepository;
 
     private final LocationService locationService;
+
+    private final OpenRouteServiceClient openRouteServiceClient;
 
     @Override
     public List<Tour> getAllTours() {
@@ -40,8 +44,13 @@ public class TourServiceImpl implements TourService {
             throw new IllegalArgumentException("New tours must not have an ID.");
         }
 
+        RouteInformation routeInformation = openRouteServiceClient.getRouteInformation(tour);
+        tour.setDistance(routeInformation.getDistanceInKilometers());
+        tour.setDuration(routeInformation.getDurationInMinutes());
+
         tour.setFrom(locationService.createLocation(tour.getFrom()));
         tour.setTo(locationService.createLocation(tour.getTo()));
+
         return tourRepository.create(tour);
     }
 
@@ -50,10 +59,20 @@ public class TourServiceImpl implements TourService {
         log.info("Update tour with id={}", tourId);
 
         Tour existingTour = getTourById(tourId);
-        Tour updatedTour = new Tour(existingTour.getId(), tour.getName(), tour.getDescription(), tour.getFrom(), tour.getTo());
 
-        tour.setFrom(locationService.updateLocation(updatedTour.getFrom()));
-        tour.setTo(locationService.updateLocation(updatedTour.getTo()));
+        RouteInformation routeInformation = openRouteServiceClient.getRouteInformation(tour);
+
+        Tour updatedTour = Tour.builder()
+                .id(existingTour.getId())
+                .name(tour.getName())
+                .description(tour.getDescription())
+                .from(locationService.updateLocation(tour.getFrom()))
+                .to(locationService.updateLocation(tour.getTo()))
+                .transportType(tour.getTransportType())
+                .distance(routeInformation.getDistanceInKilometers())
+                .duration(routeInformation.getDurationInMinutes())
+                .build();
+
         return tourRepository.update(updatedTour);
     }
 

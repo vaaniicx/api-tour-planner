@@ -17,4 +17,6 @@ public class TourCreateRequest {
     private Location from;
 
     private Location to;
+
+    private String transportType;
 }

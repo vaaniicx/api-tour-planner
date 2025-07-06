@@ -10,13 +10,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TourResponse {
 
-    public Long id;
+    private Long id;
 
-    public String name;
+    private String name;
 
-    public String description;
+    private String description;
 
-    public Location from;
+    private Location from;
 
-    public Location to;
+    private Location to;
+
+    private String transportType;
+
+    private Double distance;
+
+    private Double duration;
 }

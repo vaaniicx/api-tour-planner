@@ -1,11 +1,9 @@
 package at.fhtw.tourplanner.core.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
+@Builder
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,4 +17,10 @@ public class Tour {
     private Location from;
 
     private Location to;
+
+    private TransportType transportType;
+
+    private Double distance;
+
+    private Double duration;
 }

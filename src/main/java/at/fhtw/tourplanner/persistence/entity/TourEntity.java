@@ -1,5 +1,6 @@
 package at.fhtw.tourplanner.persistence.entity;
 
+import at.fhtw.tourplanner.core.model.TransportType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,7 +33,10 @@ public class TourEntity {
     @OneToMany(mappedBy = "tour", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TourLogEntity> tourLogs = new ArrayList<>();
 
-    // private ?? (String/Enum) transportType;
-    // private ?? estimatedTimeInMinutes; -> retrieved from OpenRouteService.org
-    // private ?? routeInformation;
+    @Enumerated(EnumType.STRING)
+    private TransportType transportType;
+
+    private Double distanceInKilometers;
+
+    private Double durationInMinutes;
 }

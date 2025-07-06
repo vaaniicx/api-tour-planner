@@ -13,8 +13,12 @@ public interface TourDtoMapper {
     TourResponse toResponse(Tour tour);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "distance", ignore = true)
+    @Mapping(target = "duration", ignore = true)
     Tour fromCreateRequest(TourCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "distance", ignore = true)
+    @Mapping(target = "duration", ignore = true)
     Tour fromUpdateRequest(TourUpdateRequest request);
 }
