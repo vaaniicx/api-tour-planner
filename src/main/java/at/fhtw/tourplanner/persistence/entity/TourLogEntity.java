@@ -20,7 +20,7 @@ public class TourLogEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "tour_id", nullable = false)
     private TourEntity tour;
 

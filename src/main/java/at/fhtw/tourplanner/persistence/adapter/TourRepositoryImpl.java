@@ -3,23 +3,23 @@ package at.fhtw.tourplanner.persistence.adapter;
 import at.fhtw.tourplanner.core.model.Tour;
 import at.fhtw.tourplanner.core.repository.TourRepository;
 import at.fhtw.tourplanner.persistence.entity.TourEntity;
+import at.fhtw.tourplanner.persistence.entity.TourLogEntity;
 import at.fhtw.tourplanner.persistence.mapper.TourMapper;
+import at.fhtw.tourplanner.persistence.repository.JpaTourLogRepository;
 import at.fhtw.tourplanner.persistence.repository.JpaTourRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+@AllArgsConstructor
 public class TourRepositoryImpl implements TourRepository {
 
     private final JpaTourRepository jpaTourRepository;
+    private final JpaTourLogRepository jpaTourLogRepository;
     private final TourMapper tourMapper;
-
-    public TourRepositoryImpl(JpaTourRepository jpaTourRepository, TourMapper tourMapper) {
-        this.jpaTourRepository = jpaTourRepository;
-        this.tourMapper = tourMapper;
-    }
 
     @Override
     public List<Tour> findAll() {
@@ -46,6 +46,7 @@ public class TourRepositoryImpl implements TourRepository {
 
     private Tour save(Tour tour) {
         TourEntity tourEntity = tourMapper.toEntity(tour);
+        tourEntity.setTourLogs(jpaTourLogRepository.findByTourId(tour.getId()));
         TourEntity savedTour = jpaTourRepository.save(tourEntity);
         return tourMapper.toDomain(savedTour);
     }
