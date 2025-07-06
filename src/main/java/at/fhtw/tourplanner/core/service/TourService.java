@@ -22,7 +22,6 @@ public class TourService {
 
     private final OpenRouteServiceClient openRouteServiceClient;
 
-    @Override
     public List<Tour> getAllTours() {
         log.info("Get all tours");
 
