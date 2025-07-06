@@ -18,4 +18,12 @@ public class TourLogResponse {
     private LocalDate date;
 
     private String comment;
+
+    private String difficulty;
+
+    private String rating;
+
+    private Double distance;
+
+    private Double duration;
 }

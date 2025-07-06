@@ -1,12 +1,14 @@
 package at.fhtw.tourplanner.core.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TourLog {
@@ -18,8 +20,11 @@ public class TourLog {
 
     private String comment;
 
-    // difficulty
-    // total distance
-    // total time
-    // rating
+    private Difficulty difficulty;
+
+    private Rating rating;
+
+    private Double distance;
+
+    private Double duration;
 }

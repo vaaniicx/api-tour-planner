@@ -1,4 +1,4 @@
-package at.fhtw.tourplanner.external.dto;
+package at.fhtw.tourplanner.external;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,12 +12,4 @@ public class RouteInformation {
     private Double distanceInMeters;
 
     private Double durationInSeconds;
-
-    public Double getDistanceInKilometers() {
-        return distanceInMeters / 1000;
-    }
-
-    public Double getDurationInMinutes() {
-        return durationInSeconds / 60;
-    }
 }

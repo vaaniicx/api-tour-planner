@@ -36,7 +36,7 @@ public class TourEntity {
     @Enumerated(EnumType.STRING)
     private TransportType transportType;
 
-    private Double distanceInKilometers;
+    private Double distanceInMeters;
 
-    private Double durationInMinutes;
+    private Double durationInSeconds;
 }

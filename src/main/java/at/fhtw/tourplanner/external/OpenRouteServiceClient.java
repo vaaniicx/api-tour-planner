@@ -3,7 +3,6 @@ package at.fhtw.tourplanner.external;
 import at.fhtw.tourplanner.core.model.Location;
 import at.fhtw.tourplanner.core.model.Tour;
 import at.fhtw.tourplanner.core.model.TransportType;
-import at.fhtw.tourplanner.external.dto.RouteInformation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.HttpUrl;
@@ -46,17 +45,17 @@ public class OpenRouteServiceClient {
 
             JsonNode json = mapper.readTree(response.body().string());
             JsonNode summary = json.get("features").get(0).get("properties").get("summary");
-            double distanceInMeters = summary.get("distance").asDouble();
-            double durationInSeconds = summary.get("duration").asDouble();
 
-            return new RouteInformation(distanceInMeters, durationInSeconds);
+            double distance = summary.get("distance").asDouble();
+            double duration = summary.get("duration").asDouble();
+            return new RouteInformation(distance, duration);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private String getProfile(TransportType transportType) {
-        return switch(transportType) {
+        return switch (transportType) {
             case CAR -> "driving-car";
             case BIKE -> "cycling-regular";
             case WALK -> "foot-walking";

@@ -1,5 +1,7 @@
 package at.fhtw.tourplanner.persistence.entity;
 
+import at.fhtw.tourplanner.core.model.Difficulty;
+import at.fhtw.tourplanner.core.model.Rating;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,10 +26,13 @@ public class TourLogEntity {
 
     private String comment;
 
-    // difficulty
-    // total distance
-    // total time
-    // rating
+    private Difficulty difficulty;
+
+    private Rating rating;
+
+    private Double distanceInMeters;
+
+    private Double durationInSeconds;
 
     private LocalDate date;
 }

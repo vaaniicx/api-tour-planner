@@ -35,7 +35,12 @@ public class TourLogServiceImpl implements TourLogService {
             throw new IllegalArgumentException("New logs must not have an ID.");
         }
 
+        Tour tour = findTourById(tourId);
+
         tourLog.setTour(findTourById(tourId));
+        tourLog.setDistance(tour.getDistance());
+        tourLog.setDuration(tour.getDuration());
+
         return tourLogRepository.create(tourLog);
     }
 
@@ -44,7 +49,18 @@ public class TourLogServiceImpl implements TourLogService {
         log.info("Update log for tour with id={}", tourId);
 
         TourLog existingTourLog = findTourLogById(tourLog.getId());
-        TourLog updatedTourLog = new TourLog(existingTourLog.getId(), existingTourLog.getTour(), tourLog.getDate(), tourLog.getComment());
+
+        TourLog updatedTourLog = TourLog.builder()
+                .id(existingTourLog.getId())
+                .tour(existingTourLog.getTour())
+                .date(tourLog.getDate())
+                .comment(tourLog.getComment())
+                .difficulty(tourLog.getDifficulty())
+                .rating(tourLog.getRating())
+                .distance(existingTourLog.getDistance())
+                .duration(existingTourLog.getDuration())
+                .build();
+
         return tourLogRepository.update(updatedTourLog);
     }
 

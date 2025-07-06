@@ -3,7 +3,7 @@ package at.fhtw.tourplanner.core.service;
 import at.fhtw.tourplanner.core.model.Tour;
 import at.fhtw.tourplanner.core.repository.TourRepository;
 import at.fhtw.tourplanner.external.OpenRouteServiceClient;
-import at.fhtw.tourplanner.external.dto.RouteInformation;
+import at.fhtw.tourplanner.external.RouteInformation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,8 +45,8 @@ public class TourServiceImpl implements TourService {
         }
 
         RouteInformation routeInformation = openRouteServiceClient.getRouteInformation(tour);
-        tour.setDistance(routeInformation.getDistanceInKilometers());
-        tour.setDuration(routeInformation.getDurationInMinutes());
+        tour.setDistance(routeInformation.getDistanceInMeters());
+        tour.setDuration(routeInformation.getDurationInSeconds());
 
         tour.setFrom(locationService.createLocation(tour.getFrom()));
         tour.setTo(locationService.createLocation(tour.getTo()));
@@ -69,8 +69,8 @@ public class TourServiceImpl implements TourService {
                 .from(locationService.updateLocation(tour.getFrom()))
                 .to(locationService.updateLocation(tour.getTo()))
                 .transportType(tour.getTransportType())
-                .distance(routeInformation.getDistanceInKilometers())
-                .duration(routeInformation.getDurationInMinutes())
+                .distance(routeInformation.getDistanceInMeters())
+                .duration(routeInformation.getDurationInSeconds())
                 .build();
 
         return tourRepository.update(updatedTour);
