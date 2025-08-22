@@ -3,7 +3,6 @@ package at.fhtw.tourplanner.persistence.adapter;
 import at.fhtw.tourplanner.core.model.Tour;
 import at.fhtw.tourplanner.core.repository.TourRepository;
 import at.fhtw.tourplanner.persistence.entity.TourEntity;
-import at.fhtw.tourplanner.persistence.entity.TourLogEntity;
 import at.fhtw.tourplanner.persistence.mapper.TourMapper;
 import at.fhtw.tourplanner.persistence.repository.JpaTourLogRepository;
 import at.fhtw.tourplanner.persistence.repository.JpaTourRepository;
