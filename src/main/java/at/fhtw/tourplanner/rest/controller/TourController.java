@@ -1,11 +1,16 @@
 package at.fhtw.tourplanner.rest.controller;
 
 import at.fhtw.tourplanner.core.model.Tour;
+import at.fhtw.tourplanner.core.model.TourLog;
+import at.fhtw.tourplanner.core.service.TourLogService;
 import at.fhtw.tourplanner.core.service.TourService;
 import at.fhtw.tourplanner.rest.dto.tour.request.TourCreateRequest;
 import at.fhtw.tourplanner.rest.dto.tour.request.TourUpdateRequest;
+import at.fhtw.tourplanner.rest.dto.tour.response.TourExportResponse;
 import at.fhtw.tourplanner.rest.dto.tour.response.TourResponse;
+import at.fhtw.tourplanner.rest.dto.tourlog.response.TourLogResponse;
 import at.fhtw.tourplanner.rest.mapper.TourDtoMapper;
+import at.fhtw.tourplanner.rest.mapper.TourLogDtoMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -14,8 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,22 +29,35 @@ public class TourController {
 
     private final TourService tourService;
 
-    private final TourDtoMapper tourDtoMapper;
+    private final TourLogService tourLogService;
 
     private final ObjectMapper objectMapper;
 
+    private final TourDtoMapper tourDtoMapper;
+
+    private final TourLogDtoMapper tourLogDtoMapper;
+
     @GetMapping
     public List<TourResponse> getAllTours() {
-        return tourService.getAllTours()
-                .stream()
+        return tourService.getAllTours().stream()
                 .map(tourDtoMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> exportTours() throws JsonProcessingException {
+        List<TourExportResponse> exportResponses = new ArrayList<>();
+
         List<TourResponse> allTours = getAllTours();
-        String response = objectMapper.writeValueAsString(allTours);
+        allTours.forEach(tour -> {
+            List<TourLogResponse> logs = tourLogService.getAllLogsForTour(tour.getId()).stream()
+                    .map(tourLogDtoMapper::toResponse)
+                    .toList();
+
+            exportResponses.add(new TourExportResponse(tour, logs));
+        });
+
+        String response = objectMapper.writeValueAsString(exportResponses);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"all-tours.json\"")
                 .body(response);
