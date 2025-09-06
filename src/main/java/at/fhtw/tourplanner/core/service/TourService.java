@@ -1,7 +1,7 @@
 package at.fhtw.tourplanner.core.service;
 
+import at.fhtw.tourplanner.core.exception.*;
 import at.fhtw.tourplanner.core.model.Tour;
-import at.fhtw.tourplanner.core.repository.TourLogRepository;
 import at.fhtw.tourplanner.core.repository.TourRepository;
 import at.fhtw.tourplanner.external.OpenRouteServiceClient;
 import at.fhtw.tourplanner.external.RouteInformation;
@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -18,8 +17,6 @@ import java.util.NoSuchElementException;
 public class TourService {
 
     private final TourRepository tourRepository;
-
-    private final TourLogRepository tourLogRepository;
 
     private final LocationService locationService;
 
@@ -35,50 +32,61 @@ public class TourService {
 
     public Tour getTourById(Long id) {
         return tourRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Tour not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Tour not found."));
     }
 
     public Tour getTourWithLogs(Long id) {
         return tourRepository.findByIdWithLogs(id)
-                .orElseThrow(() -> new NoSuchElementException("Tour not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Tour not found."));
     }
 
     public Tour createTour(Tour tour) {
         if (tour.getId() != null) {
-            throw new IllegalArgumentException("New tours must not have an ID.");
+            throw new InvalidEntityException("New tours must not have an ID.");
         }
 
-        RouteInformation routeInformation = openRouteServiceClient.getRouteInformation(tour);
-        tour.setDistanceInMeters(routeInformation.getDistanceInMeters());
-        tour.setDurationInSeconds(routeInformation.getDurationInSeconds());
+        try {
+            RouteInformation routeInformation = openRouteServiceClient.getRouteInformation(tour);
+            tour.setDistanceInMeters(routeInformation.getDistanceInMeters());
+            tour.setDurationInSeconds(routeInformation.getDurationInSeconds());
 
-        tour.setFrom(locationService.createLocation(tour.getFrom()));
-        tour.setTo(locationService.createLocation(tour.getTo()));
-
-        return tourRepository.create(tour);
+            tour.setFrom(locationService.createLocation(tour.getFrom()));
+            tour.setTo(locationService.createLocation(tour.getTo()));
+            return tourRepository.create(tour);
+        } catch (Exception e) {
+            throw new EntityCreateException(e.getMessage(), e);
+        }
     }
 
     public Tour updateTour(Long tourId, Tour tour) {
         Tour existingTour = getTourById(tourId);
 
-        RouteInformation routeInformation = openRouteServiceClient.getRouteInformation(tour);
+        try {
+            RouteInformation routeInformation = openRouteServiceClient.getRouteInformation(tour);
 
-        Tour updatedTour = Tour.builder()
-                .id(existingTour.getId())
-                .name(tour.getName())
-                .description(tour.getDescription())
-                .from(locationService.updateLocation(tour.getFrom()))
-                .to(locationService.updateLocation(tour.getTo()))
-                .transportType(tour.getTransportType())
-                .distanceInMeters(routeInformation.getDistanceInMeters())
-                .durationInSeconds(routeInformation.getDurationInSeconds())
-                .build();
+            Tour updatedTour = Tour.builder()
+                    .id(existingTour.getId())
+                    .name(tour.getName())
+                    .description(tour.getDescription())
+                    .from(locationService.updateLocation(tour.getFrom()))
+                    .to(locationService.updateLocation(tour.getTo()))
+                    .transportType(tour.getTransportType())
+                    .distanceInMeters(routeInformation.getDistanceInMeters())
+                    .durationInSeconds(routeInformation.getDurationInSeconds())
+                    .build();
 
-        return tourRepository.update(updatedTour);
+            return tourRepository.update(updatedTour);
+        } catch (Exception e) {
+            throw new EntityUpdateException(e.getMessage(), e);
+        }
     }
 
     public void deleteTour(Long id) {
-        Tour existingTour = getTourById(id);
-        tourRepository.delete(existingTour);
+        try {
+            Tour existingTour = getTourById(id);
+            tourRepository.delete(existingTour);
+        } catch (Exception e) {
+            throw new EntityDeleteException(e.getMessage(), e);
+        }
     }
 }

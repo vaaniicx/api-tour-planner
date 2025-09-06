@@ -1,5 +1,6 @@
 package at.fhtw.tourplanner.external;
 
+import at.fhtw.tourplanner.core.exception.ServiceRequestException;
 import at.fhtw.tourplanner.core.model.Location;
 import at.fhtw.tourplanner.core.model.Tour;
 import at.fhtw.tourplanner.core.model.TransportType;
@@ -28,7 +29,7 @@ public class OpenRouteServiceClient {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public RouteInformation getRouteInformation(Tour tour) {
+    public RouteInformation getRouteInformation(Tour tour) throws ServiceRequestException {
         HttpUrl url = Objects.requireNonNull(HttpUrl.parse(baseUrl + getProfile(tour.getTransportType())))
                 .newBuilder()
                 .addQueryParameter("api_key", apiKey)
@@ -43,7 +44,11 @@ public class OpenRouteServiceClient {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
+                throw new ServiceRequestException("Unexpected code " + response.code());
+            }
+
+            if (response.body() == null) {
+                throw new ServiceRequestException("Expected non-empty response body.");
             }
 
             JsonNode json = mapper.readTree(response.body().string());
@@ -53,7 +58,7 @@ public class OpenRouteServiceClient {
             double duration = summary.get("duration").asDouble();
             return new RouteInformation(distance, duration);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ServiceRequestException("Unsuccessful service request: ", e);
         }
     }
 
