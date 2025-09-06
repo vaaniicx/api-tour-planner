@@ -23,20 +23,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(EntityCreateException.class)
-    public ResponseEntity<Object> handleCreateException(EntityNotFoundException ex) {
-        log.error(ex.getMessage(), ex);
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-    }
-
-    @ExceptionHandler(EntityUpdateException.class)
-    public ResponseEntity<Object> handleUpdateException(EntityNotFoundException ex) {
-        log.error(ex.getMessage(), ex);
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-    }
-
-    @ExceptionHandler(EntityDeleteException.class)
-    public ResponseEntity<Object> handleDeleteException(EntityNotFoundException ex) {
+    @ExceptionHandler({
+            EntityCreateException.class,
+            EntityUpdateException.class,
+            EntityDeleteException.class
+    })
+    public ResponseEntity<Object> handleModificationExceptions(RuntimeException ex) {
         log.error(ex.getMessage(), ex);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
