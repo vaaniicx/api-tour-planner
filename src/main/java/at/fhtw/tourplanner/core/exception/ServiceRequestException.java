@@ -1,6 +1,7 @@
 package at.fhtw.tourplanner.core.exception;
 
 public class ServiceRequestException extends RuntimeException {
+
     public ServiceRequestException(String message) {
         super(message);
     }

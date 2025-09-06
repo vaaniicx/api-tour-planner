@@ -32,17 +32,17 @@ public class TourService {
 
     public Tour getTourById(Long id) {
         return tourRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tour not found."));
+                .orElseThrow(() -> new EntityNotFoundException("Could not find tour with id: " + id));
     }
 
     public Tour getTourWithLogs(Long id) {
         return tourRepository.findByIdWithLogs(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tour not found."));
+                .orElseThrow(() -> new EntityNotFoundException("Could not find tour with id: " + id));
     }
 
     public Tour createTour(Tour tour) {
         if (tour.getId() != null) {
-            throw new InvalidEntityException("New tours must not have an ID.");
+            throw new InvalidEntityException("New tours must not have an id.");
         }
 
         try {
@@ -54,7 +54,7 @@ public class TourService {
             tour.setTo(locationService.createLocation(tour.getTo()));
             return tourRepository.create(tour);
         } catch (Exception e) {
-            throw new EntityCreateException(e.getMessage(), e);
+            throw new EntityCreateException("Could not create tour: ", e);
         }
     }
 
@@ -77,16 +77,17 @@ public class TourService {
 
             return tourRepository.update(updatedTour);
         } catch (Exception e) {
-            throw new EntityUpdateException(e.getMessage(), e);
+            throw new EntityUpdateException("Could not update tour with id: " + tourId, e);
         }
     }
 
     public void deleteTour(Long id) {
+        Tour existingTour = getTourById(id);
+
         try {
-            Tour existingTour = getTourById(id);
             tourRepository.delete(existingTour);
         } catch (Exception e) {
-            throw new EntityDeleteException(e.getMessage(), e);
+            throw new EntityDeleteException("Could not delete tour with id: " + id, e);
         }
     }
 }
