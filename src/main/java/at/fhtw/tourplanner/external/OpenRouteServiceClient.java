@@ -19,19 +19,19 @@ import java.util.Objects;
 public class OpenRouteServiceClient {
 
     @Value("${openrouteservice.api.baseurl}")
-    private static String BASE_URL;
+    private String baseUrl;
 
     @Value("${openrouteservice.api.key}")
-    private static String API_KEY;
+    private String apiKey;
 
     private final OkHttpClient client = new OkHttpClient();
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     public RouteInformation getRouteInformation(Tour tour) {
-        HttpUrl url = Objects.requireNonNull(HttpUrl.parse(BASE_URL + getProfile(tour.getTransportType())))
+        HttpUrl url = Objects.requireNonNull(HttpUrl.parse(baseUrl + getProfile(tour.getTransportType())))
                 .newBuilder()
-                .addQueryParameter("api_key", API_KEY)
+                .addQueryParameter("api_key", apiKey)
                 .addEncodedQueryParameter("start", buildLocationQueryParam(tour.getFrom()))
                 .addEncodedQueryParameter("end", buildLocationQueryParam(tour.getTo()))
                 .build();
