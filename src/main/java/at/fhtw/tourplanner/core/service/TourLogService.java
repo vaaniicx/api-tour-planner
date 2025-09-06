@@ -21,14 +21,10 @@ public class TourLogService {
     private final TourRepository tourRepository;
 
     public List<TourLog> getAllLogsForTour(Long tourId) {
-        log.info("Get all logs for tour with id={}", tourId);
-
         return tourLogRepository.findByTourId(tourId);
     }
 
     public TourLog createLogForTour(Long tourId, TourLog tourLog) throws NoSuchElementException {
-        log.info("Create new log for tour with id={}", tourId);
-
         if (tourLog.getId() != null) {
             throw new IllegalArgumentException("New logs must not have an ID.");
         }
@@ -43,8 +39,6 @@ public class TourLogService {
     }
 
     public TourLog updateLogForTour(Long tourId, TourLog tourLog) throws NoSuchElementException {
-        log.info("Update log for tour with id={}", tourId);
-
         TourLog existingTourLog = findTourLogById(tourLog.getId());
 
         TourLog updatedTourLog = TourLog.builder()
@@ -62,8 +56,6 @@ public class TourLogService {
     }
 
     public void deleteLogForTour(Long tourId, Long logId) {
-        log.info("Delete log with id={}", logId);
-
         findTourById(tourId);
         tourLogRepository.delete(logId);
     }

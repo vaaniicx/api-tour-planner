@@ -26,30 +26,24 @@ public class TourService {
     private final OpenRouteServiceClient openRouteServiceClient;
 
     public List<Tour> getAllTours() {
-        log.info("Get all tours");
         return tourRepository.findAll();
     }
 
     public List<Tour> getAllToursWithLogs() {
-        log.debug("Get all tours with logs");
         return tourRepository.findAllWithLogs();
     }
 
     public Tour getTourById(Long id) {
-        log.debug("Get tour with id={}", id);
         return tourRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Tour not found"));
     }
 
     public Tour getTourWithLogs(Long id) {
-        log.debug("Get tour with logs");
         return tourRepository.findByIdWithLogs(id)
                 .orElseThrow(() -> new NoSuchElementException("Tour not found"));
     }
 
     public Tour createTour(Tour tour) {
-        log.info("Create new tour: {}", tour.toString());
-
         if (tour.getId() != null) {
             throw new IllegalArgumentException("New tours must not have an ID.");
         }
@@ -65,8 +59,6 @@ public class TourService {
     }
 
     public Tour updateTour(Long tourId, Tour tour) {
-        log.info("Update tour with id={}", tourId);
-
         Tour existingTour = getTourById(tourId);
 
         RouteInformation routeInformation = openRouteServiceClient.getRouteInformation(tour);
@@ -86,8 +78,6 @@ public class TourService {
     }
 
     public void deleteTour(Long id) {
-        log.info("Delete tour with id={}", id);
-
         Tour existingTour = getTourById(id);
         tourRepository.delete(existingTour);
     }
