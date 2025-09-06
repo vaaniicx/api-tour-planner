@@ -17,19 +17,34 @@ import java.util.Optional;
 public class TourRepositoryImpl implements TourRepository {
 
     private final JpaTourRepository jpaTourRepository;
+
     private final JpaTourLogRepository jpaTourLogRepository;
+
     private final TourMapper tourMapper;
 
     @Override
     public List<Tour> findAll() {
-        return jpaTourRepository.findAll()
-                .stream().map(tourMapper::toDomain)
+        return jpaTourRepository.findAll().stream()
+                .map(tourMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Tour> findAllWithLogs() {
+        return jpaTourRepository.findAllWithLogs().stream()
+                .map(tourMapper::toDomain)
                 .toList();
     }
 
     @Override
     public Optional<Tour> findById(Long id) {
         return jpaTourRepository.findById(id)
+                .map(tourMapper::toDomain);
+    }
+
+    @Override
+    public Optional<Tour> findByIdWithLogs(Long id) {
+        return jpaTourRepository.findByIdWithLogs(id)
                 .map(tourMapper::toDomain);
     }
 

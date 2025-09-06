@@ -5,19 +5,16 @@ import at.fhtw.tourplanner.persistence.entity.TourEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {LocationMapper.class})
+@Mapper(componentModel = "spring", uses = { LocationMapper.class, TourLogMapper.class })
 public interface TourMapper {
 
-    @Mapping(source = "from", target = "fromLocation")
-    @Mapping(source = "to", target = "toLocation")
-    @Mapping(source = "distance", target = "distanceInMeters")
-    @Mapping(source = "duration", target = "durationInSeconds")
+    @Mapping(target = "fromLocation", source = "from")
+    @Mapping(target = "toLocation", source = "to")
     @Mapping(target = "tourLogs", ignore = true)
     TourEntity toEntity(Tour domain);
 
-    @Mapping(source = "fromLocation", target = "from")
-    @Mapping(source = "toLocation", target = "to")
-    @Mapping(source = "distanceInMeters", target = "distance")
-    @Mapping(source = "durationInSeconds", target = "duration")
-    Tour toDomain(TourEntity entity);
+    @Mapping(target = "from", source = "fromLocation")
+    @Mapping(target = "to", source = "toLocation")
+    @Mapping(target = "logs", source = "tourLogs")
+    Tour  toDomain(TourEntity entity);
 }

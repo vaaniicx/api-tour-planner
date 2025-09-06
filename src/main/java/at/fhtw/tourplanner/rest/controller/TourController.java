@@ -1,9 +1,10 @@
 package at.fhtw.tourplanner.rest.controller;
 
 import at.fhtw.tourplanner.core.model.Tour;
-import at.fhtw.tourplanner.core.model.TourLog;
 import at.fhtw.tourplanner.core.service.TourLogService;
 import at.fhtw.tourplanner.core.service.TourService;
+import at.fhtw.tourplanner.report.SingleTourReport;
+import at.fhtw.tourplanner.report.SummaryReport;
 import at.fhtw.tourplanner.rest.dto.tour.request.TourCreateRequest;
 import at.fhtw.tourplanner.rest.dto.tour.request.TourUpdateRequest;
 import at.fhtw.tourplanner.rest.dto.tour.response.TourExportResponse;
@@ -13,6 +14,7 @@ import at.fhtw.tourplanner.rest.mapper.TourDtoMapper;
 import at.fhtw.tourplanner.rest.mapper.TourLogDtoMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itextpdf.text.DocumentException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -80,6 +82,24 @@ public class TourController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"tour.json\"")
                 .body(response);
+    }
+
+    @GetMapping(value = "/report", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> reportTourById() throws DocumentException {
+        List<Tour> allTours = tourService.getAllToursWithLogs();
+        byte[] pdf = new SummaryReport(allTours).generateReport();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"all-tours-report.pdf\"")
+                .body(pdf);
+    }
+
+    @GetMapping(value = "/report/{tourId}", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> reportTourById(@PathVariable("tourId") Long tourId) throws DocumentException {
+        Tour tour = tourService.getTourWithLogs(tourId);
+        byte[] pdf = new SingleTourReport(tour).generateReport();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"tour-report.pdf\"")
+                .body(pdf);
     }
 
     @PostMapping

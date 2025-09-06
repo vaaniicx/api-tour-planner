@@ -24,7 +24,7 @@ public class TourLog {
 
     private Rating rating;
 
-    private Double distance;
+    private Double distanceInMeters;
 
-    private Double duration;
+    private Double durationInSeconds;
 }

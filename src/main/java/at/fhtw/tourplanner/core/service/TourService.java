@@ -1,6 +1,7 @@
 package at.fhtw.tourplanner.core.service;
 
 import at.fhtw.tourplanner.core.model.Tour;
+import at.fhtw.tourplanner.core.repository.TourLogRepository;
 import at.fhtw.tourplanner.core.repository.TourRepository;
 import at.fhtw.tourplanner.external.OpenRouteServiceClient;
 import at.fhtw.tourplanner.external.RouteInformation;
@@ -18,20 +19,32 @@ public class TourService {
 
     private final TourRepository tourRepository;
 
+    private final TourLogRepository tourLogRepository;
+
     private final LocationService locationService;
 
     private final OpenRouteServiceClient openRouteServiceClient;
 
     public List<Tour> getAllTours() {
         log.info("Get all tours");
-
         return tourRepository.findAll();
+    }
+
+    public List<Tour> getAllToursWithLogs() {
+        log.debug("Get all tours with logs");
+        return tourRepository.findAllWithLogs();
     }
 
     public Tour getTourById(Long id) {
         log.debug("Get tour with id={}", id);
+        return tourRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Tour not found"));
+    }
 
-        return tourRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Tour not found"));
+    public Tour getTourWithLogs(Long id) {
+        log.debug("Get tour with logs");
+        return tourRepository.findByIdWithLogs(id)
+                .orElseThrow(() -> new NoSuchElementException("Tour not found"));
     }
 
     public Tour createTour(Tour tour) {
@@ -42,8 +55,8 @@ public class TourService {
         }
 
         RouteInformation routeInformation = openRouteServiceClient.getRouteInformation(tour);
-        tour.setDistance(routeInformation.getDistanceInMeters());
-        tour.setDuration(routeInformation.getDurationInSeconds());
+        tour.setDistanceInMeters(routeInformation.getDistanceInMeters());
+        tour.setDurationInSeconds(routeInformation.getDurationInSeconds());
 
         tour.setFrom(locationService.createLocation(tour.getFrom()));
         tour.setTo(locationService.createLocation(tour.getTo()));
@@ -65,8 +78,8 @@ public class TourService {
                 .from(locationService.updateLocation(tour.getFrom()))
                 .to(locationService.updateLocation(tour.getTo()))
                 .transportType(tour.getTransportType())
-                .distance(routeInformation.getDistanceInMeters())
-                .duration(routeInformation.getDurationInSeconds())
+                .distanceInMeters(routeInformation.getDistanceInMeters())
+                .durationInSeconds(routeInformation.getDurationInSeconds())
                 .build();
 
         return tourRepository.update(updatedTour);

@@ -36,8 +36,8 @@ public class TourLogService {
         Tour tour = findTourById(tourId);
 
         tourLog.setTour(findTourById(tourId));
-        tourLog.setDistance(tour.getDistance());
-        tourLog.setDuration(tour.getDuration());
+        tourLog.setDistanceInMeters(tour.getDistanceInMeters());
+        tourLog.setDurationInSeconds(tour.getDurationInSeconds());
 
         return tourLogRepository.create(tourLog);
     }
@@ -54,8 +54,8 @@ public class TourLogService {
                 .comment(tourLog.getComment())
                 .difficulty(tourLog.getDifficulty())
                 .rating(tourLog.getRating())
-                .distance(existingTourLog.getDistance())
-                .duration(existingTourLog.getDuration())
+                .distanceInMeters(existingTourLog.getDistanceInMeters())
+                .durationInSeconds(existingTourLog.getDurationInSeconds())
                 .build();
 
         return tourLogRepository.update(updatedTourLog);

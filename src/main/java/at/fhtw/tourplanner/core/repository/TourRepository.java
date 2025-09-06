@@ -8,7 +8,11 @@ import java.util.Optional;
 public interface TourRepository {
     List<Tour> findAll();
 
+    List<Tour> findAllWithLogs();
+
     Optional<Tour> findById(Long id);
+
+    Optional<Tour> findByIdWithLogs(Long id);
 
     Tour create(Tour tour);
 
