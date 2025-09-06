@@ -9,6 +9,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,9 +18,11 @@ import java.util.Objects;
 @Service
 public class OpenRouteServiceClient {
 
-    private static final String BASE_URL = "https://api.openrouteservice.org/v2/directions/";
+    @Value("${openrouteservice.api.baseurl}")
+    private static String BASE_URL;
 
-    private final String API_KEY = "5b3ce3597851110001cf6248f73c515f1dc24780a52fc71c4bf34a09";
+    @Value("${openrouteservice.api.key}")
+    private static String API_KEY;
 
     private final OkHttpClient client = new OkHttpClient();
 
