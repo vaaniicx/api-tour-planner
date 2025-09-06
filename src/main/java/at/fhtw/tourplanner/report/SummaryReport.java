@@ -13,9 +13,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SummaryReport implements PdfReport {
 
-    private final List<Tour> tours;
-
     private static final int LOG_TABLE_COLUMNS = 4;
+
+    private final List<Tour> tours;
 
     @Override
     public byte[] generateReport() throws DocumentException {

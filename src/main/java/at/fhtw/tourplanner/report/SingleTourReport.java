@@ -8,15 +8,15 @@ import com.itextpdf.text.pdf.PdfPTable;
 import lombok.RequiredArgsConstructor;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
+import java.io.IOException;
 
 @RequiredArgsConstructor
 public class SingleTourReport implements PdfReport {
 
-    private final Tour tour;
-
     private static final int LOG_TABLE_COLUMNS = 6;
+
+    private final Tour tour;
 
     @Override
     public byte[] generateReport() throws DocumentException {
