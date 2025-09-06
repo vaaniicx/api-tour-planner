@@ -1,6 +1,7 @@
 package at.fhtw.tourplanner.rest.config;
 
 import at.fhtw.tourplanner.core.exception.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,36 +13,43 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @ControllerAdvice(annotations = RestController.class)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(EntityNotFoundException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(EntityCreateException.class)
     public ResponseEntity<Object> handleCreateException(EntityNotFoundException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
     @ExceptionHandler(EntityUpdateException.class)
     public ResponseEntity<Object> handleUpdateException(EntityNotFoundException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
     @ExceptionHandler(EntityDeleteException.class)
     public ResponseEntity<Object> handleDeleteException(EntityNotFoundException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidEntityException.class)
     public ResponseEntity<Object> handleInvalidException(EntityNotFoundException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(ServiceRequestException.class)
     public ResponseEntity<Object> handleServiceRequestException(EntityNotFoundException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
