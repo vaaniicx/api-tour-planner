@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,44 +49,30 @@ public class TourController {
 
     @GetMapping("/{tourId}")
     public ResponseEntity<TourResponse> getTourById(@PathVariable("tourId") Long tourId) {
-        try {
-            Tour tourById = tourService.getTourById(tourId);
-            return ResponseEntity.ok(tourDtoMapper.toResponse(tourById));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Tour tourById = tourService.getTourById(tourId);
+        return ResponseEntity.ok(tourDtoMapper.toResponse(tourById));
     }
 
     @PostMapping
     public ResponseEntity<TourResponse> createTour(@RequestBody TourCreateRequest request) {
-        try {
-            Tour createdTour = tourService.createTour(tourDtoMapper.fromCreateRequest(request));
-            return ResponseEntity.ok(tourDtoMapper.toResponse(createdTour));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Tour createdTour = tourService.createTour(tourDtoMapper.fromCreateRequest(request));
+        return ResponseEntity
+                .created(URI.create("/api/tours/" + createdTour.getId()))
+                .body(tourDtoMapper.toResponse(createdTour));
     }
 
     @PutMapping("/{tourId}")
     public ResponseEntity<TourResponse> updateTour(@PathVariable("tourId") Long tourId,
                                                    @RequestBody TourUpdateRequest request) {
-        try {
-            Tour tourToBeUpdated = tourDtoMapper.fromUpdateRequest(request);
-            Tour updatedTour = tourService.updateTour(tourId, tourToBeUpdated);
-            return ResponseEntity.ok(tourDtoMapper.toResponse(updatedTour));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Tour tourToBeUpdated = tourDtoMapper.fromUpdateRequest(request);
+        Tour updatedTour = tourService.updateTour(tourId, tourToBeUpdated);
+        return ResponseEntity.ok(tourDtoMapper.toResponse(updatedTour));
     }
 
     @DeleteMapping("/{tourId}")
     public ResponseEntity<Void> deleteTour(@PathVariable("tourId") Long tourId) {
-        try {
-            tourService.deleteTour(tourId);
-            return ResponseEntity.ok().build();
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        tourService.deleteTour(tourId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)
