@@ -14,15 +14,15 @@ public interface TourDtoMapper {
     @Mapping(target = "duration", source = "durationInSeconds")
     TourResponse toResponse(Tour tour);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "distanceInMeters", ignore = true)
-    @Mapping(target = "durationInSeconds", ignore = true)
-    @Mapping(target = "logs", ignore = true)
+    @Mapping(target = "id", expression = "java(null)")
+    @Mapping(target = "distanceInMeters", expression = "java(null)")
+    @Mapping(target = "durationInSeconds", expression = "java(null)")
+    @Mapping(target = "logs", expression = "java(null)")
     Tour fromCreateRequest(TourCreateRequest request);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "distanceInMeters", ignore = true)
-    @Mapping(target = "durationInSeconds", ignore = true)
-    @Mapping(target = "logs", ignore = true)
+    @Mapping(target = "id", expression = "java(null)")
+    @Mapping(target = "distanceInMeters", expression = "java(null)")
+    @Mapping(target = "durationInSeconds", expression = "java(null)")
+    @Mapping(target = "logs", expression = "java(null)")
     Tour fromUpdateRequest(TourUpdateRequest request);
 }
