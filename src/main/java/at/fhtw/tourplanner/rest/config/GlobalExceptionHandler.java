@@ -34,13 +34,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(InvalidEntityException.class)
-    public ResponseEntity<Object> handleInvalidException(EntityNotFoundException ex) {
+    public ResponseEntity<Object> handleInvalidException(InvalidEntityException ex) {
         log.error(ex.getMessage(), ex);
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(ServiceRequestException.class)
-    public ResponseEntity<Object> handleServiceRequestException(EntityNotFoundException ex) {
+    public ResponseEntity<Object> handleServiceRequestException(ServiceRequestException ex) {
         log.error(ex.getMessage(), ex);
         return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
