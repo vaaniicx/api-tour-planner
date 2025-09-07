@@ -46,25 +46,6 @@ public class TourController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> exportTours() throws JsonProcessingException {
-        List<TourExportResponse> exportResponses = new ArrayList<>();
-
-        List<TourResponse> allTours = getAllTours();
-        allTours.forEach(tour -> {
-            List<TourLogResponse> logs = tourLogService.getAllLogsForTour(tour.getId()).stream()
-                    .map(tourLogDtoMapper::toResponse)
-                    .toList();
-
-            exportResponses.add(new TourExportResponse(tour, logs));
-        });
-
-        String response = objectMapper.writeValueAsString(exportResponses);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"all-tours.json\"")
-                .body(response);
-    }
-
     @GetMapping("/{tourId}")
     public ResponseEntity<TourResponse> getTourById(@PathVariable("tourId") Long tourId) {
         try {
@@ -73,33 +54,6 @@ public class TourController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    @GetMapping(value = "/export/{tourId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> exportTourById(@PathVariable("tourId") Long tourId) throws JsonProcessingException {
-        ResponseEntity<TourResponse> tourById = getTourById(tourId);
-        String response = objectMapper.writeValueAsString(tourById);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"tour.json\"")
-                .body(response);
-    }
-
-    @GetMapping(value = "/report", produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<byte[]> reportTourById() throws DocumentException {
-        List<Tour> allTours = tourService.getAllToursWithLogs();
-        byte[] pdf = new SummaryReport(allTours).generateReport();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"all-tours-report.pdf\"")
-                .body(pdf);
-    }
-
-    @GetMapping(value = "/report/{tourId}", produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<byte[]> reportTourById(@PathVariable("tourId") Long tourId) throws DocumentException {
-        Tour tour = tourService.getTourWithLogs(tourId);
-        byte[] pdf = new SingleTourReport(tour).generateReport();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"tour-report.pdf\"")
-                .body(pdf);
     }
 
     @PostMapping
@@ -132,5 +86,51 @@ public class TourController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> exportTours() throws JsonProcessingException {
+        List<TourExportResponse> exportResponses = new ArrayList<>();
+
+        List<TourResponse> allTours = getAllTours();
+        allTours.forEach(tour -> {
+            List<TourLogResponse> logs = tourLogService.getAllLogsForTour(tour.getId()).stream()
+                    .map(tourLogDtoMapper::toResponse)
+                    .toList();
+
+            exportResponses.add(new TourExportResponse(tour, logs));
+        });
+
+        String response = objectMapper.writeValueAsString(exportResponses);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"all-tours.json\"")
+                .body(response);
+    }
+
+    @GetMapping(value = "/export/{tourId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> exportTourById(@PathVariable("tourId") Long tourId) throws JsonProcessingException {
+        ResponseEntity<TourResponse> tourById = getTourById(tourId);
+        String response = objectMapper.writeValueAsString(tourById);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"tour.json\"")
+                .body(response);
+    }
+
+    @GetMapping(value = "/report", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> reportTourById() throws DocumentException {
+        List<Tour> allTours = tourService.getAllToursWithLogs();
+        byte[] pdf = new SummaryReport(allTours).generateReport();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"all-tours-report.pdf\"")
+                .body(pdf);
+    }
+
+    @GetMapping(value = "/report/{tourId}", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> reportTourById(@PathVariable("tourId") Long tourId) throws DocumentException {
+        Tour tour = tourService.getTourWithLogs(tourId);
+        byte[] pdf = new SingleTourReport(tour).generateReport();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"tour-report.pdf\"")
+                .body(pdf);
     }
 }
