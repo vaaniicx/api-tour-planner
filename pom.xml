@@ -12,13 +12,15 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <spring-boot-starter.version>3.5.3</spring-boot-starter.version>
+    <spring-boot-starter.version>3.5.5</spring-boot-starter.version>
     <postgresql.version>42.7.7</postgresql.version>
     <lombok.version>1.18.38</lombok.version>
     <mapstruct.version>1.5.5.Final</mapstruct.version>
     <slf4j-api.version>2.0.17</slf4j-api.version>
     <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
     <okhttp.version>4.12.0</okhttp.version>
+    <h2.version>2.3.232</h2.version>
+    <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
   </properties>
 
   <dependencies>
@@ -38,9 +40,21 @@
       <version>${spring-boot-starter.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <version>${spring-boot-starter.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>${postgresql.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${h2.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -88,6 +102,14 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>${spring-boot-starter.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.1.2</version>
+        <configuration>
+          <argLine>-javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/1.15.11/byte-buddy-agent-1.15.11.jar</argLine>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
