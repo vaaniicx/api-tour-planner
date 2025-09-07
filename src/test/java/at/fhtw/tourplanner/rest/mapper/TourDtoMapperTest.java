@@ -99,26 +99,6 @@ class TourDtoMapperTest {
         assertThat(tour.getLogs()).isNull();
     }
 
-    private TourUpdateRequest getFullTourUpdateRequest() {
-        return TourUpdateRequest.builder()
-                .name("name")
-                .description("description")
-                .from(new Location(null, "from-lat", "from-lng"))
-                .to(new Location(null, "to-lat", "to-lng"))
-                .transportType(TransportType.HIKE.toString())
-                .build();
-    }
-
-    private TourCreateRequest getFullTourCreateRequest() {
-        return TourCreateRequest.builder()
-                .name("name")
-                .description("description")
-                .from(new Location(null, "from-lat", "from-lng"))
-                .to(new Location(null, "to-lat", "to-lng"))
-                .transportType(TransportType.HIKE.toString())
-                .build();
-    }
-
     @Test
     void fromUpdateRequest_canHandleNull() {
         assertDoesNotThrow(() -> mapper.fromUpdateRequest(null));
@@ -138,6 +118,26 @@ class TourDtoMapperTest {
                 .transportType(TransportType.WALK)
                 .distanceInMeters(1000d)
                 .durationInSeconds(600d)
+                .build();
+    }
+
+    private TourUpdateRequest getFullTourUpdateRequest() {
+        return TourUpdateRequest.builder()
+                .name("name")
+                .description("description")
+                .from(new Location(null, "from-lat", "from-lng"))
+                .to(new Location(null, "to-lat", "to-lng"))
+                .transportType(TransportType.HIKE.toString())
+                .build();
+    }
+
+    private TourCreateRequest getFullTourCreateRequest() {
+        return TourCreateRequest.builder()
+                .name("name")
+                .description("description")
+                .from(new Location(null, "from-lat", "from-lng"))
+                .to(new Location(null, "to-lat", "to-lng"))
+                .transportType(TransportType.HIKE.toString())
                 .build();
     }
 }
