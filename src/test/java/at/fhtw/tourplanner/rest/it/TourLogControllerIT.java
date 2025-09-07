@@ -2,8 +2,6 @@ package at.fhtw.tourplanner.rest.it;
 
 import at.fhtw.tourplanner.core.model.Tour;
 import at.fhtw.tourplanner.core.model.TourLog;
-import at.fhtw.tourplanner.rest.dto.tour.request.TourUpdateRequest;
-import at.fhtw.tourplanner.rest.dto.tour.response.TourResponse;
 import at.fhtw.tourplanner.rest.dto.tourlog.request.TourLogCreateRequest;
 import at.fhtw.tourplanner.rest.dto.tourlog.request.TourLogUpdateRequest;
 import at.fhtw.tourplanner.rest.dto.tourlog.response.TourLogResponse;

@@ -1,5 +1,7 @@
 package at.fhtw.tourplanner.rest.mapper;
 
+import at.fhtw.tourplanner.core.model.Difficulty;
+import at.fhtw.tourplanner.core.model.Rating;
 import at.fhtw.tourplanner.core.model.Tour;
 import at.fhtw.tourplanner.core.model.TourLog;
 import at.fhtw.tourplanner.rest.dto.tourlog.request.TourLogCreateRequest;
@@ -8,123 +10,139 @@ import at.fhtw.tourplanner.rest.dto.tourlog.response.TourLogResponse;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import java.lang.reflect.Method;
+import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class TourLogDtoMapperTest {
 
     private final TourLogDtoMapper mapper = Mappers.getMapper(TourLogDtoMapper.class);
 
-    // Prüft: Wenn toResponse(null) aufgerufen wird, soll null zurückkommen.
+
     @Test
-    void toResponse_null_returnsNull() {
-        assertNull(mapper.toResponse(null));
+    void toResponse_canHandle() {
+        // arrange
+        TourLog tourLog = getFullTourLog();
+
+        // act
+        TourLogResponse response = mapper.toResponse(tourLog);
+
+        // assert
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(tourLog.getId());
+        assertThat(response.getDate()).isEqualTo(tourLog.getDate());
+        assertThat(response.getComment()).isEqualTo(tourLog.getComment());
+        assertThat(Difficulty.valueOf(response.getDifficulty())).isEqualTo(tourLog.getDifficulty());
+        assertThat(Rating.valueOf(response.getRating())).isEqualTo(tourLog.getRating());
+        assertThat(response.getDistance()).isEqualTo(tourLog.getDistanceInMeters());
+        assertThat(response.getDuration()).isEqualTo(tourLog.getDurationInSeconds());
     }
 
-    // Prüft: Wenn fromCreateRequest(null) aufgerufen wird, soll null zurückkommen.
     @Test
-    void fromCreateRequest_null_returnsNull() {
-        assertNull(mapper.fromCreateRequest(null));
+    void toResponse_canHandleNull() {
+        assertDoesNotThrow(() -> mapper.toResponse(null));
     }
 
-    // Prüft: Wenn fromUpdateRequest(null) aufgerufen wird, soll null zurückkommen.
     @Test
-    void fromUpdateRequest_null_returnsNull() {
-        assertNull(mapper.fromUpdateRequest(null));
+    void toResponse_canHandleEmpty() {
+        assertDoesNotThrow(() -> mapper.toResponse(new TourLog()));
     }
 
-    // Prüft: toResponse mappt tour.id → tourId, distanceInMeters → distance, durationInSeconds → duration (robust bzgl. Namensvarianten).
     @Test
-    void toResponse_maps_fields_correctly() throws Exception {
-        Tour tour = new Tour();
-        tryInvoke(tour, "setId", 99L);
+    void fromCreateRequest_canHandle() {
+        // arrange
+        TourLogCreateRequest request = getFullTourLogCreateRequest();
 
-        TourLog log = new TourLog();
-        tryInvoke(log, "setTour", tour);
-        tryInvoke(log, "setDistanceInMeters", 1234L);
-        tryInvoke(log, "setDurationInSeconds", 5678L);
+        // act
+        TourLog tourLog = mapper.fromCreateRequest(request);
 
-        TourLogResponse res = mapper.toResponse(log);
-        assertNotNull(res);
+        // assert
+        assertThat(tourLog).isNotNull();
+        assertThat(tourLog.getDate()).isEqualTo(request.getDate());
+        assertThat(tourLog.getComment()).isEqualTo(request.getComment());
+        assertThat(tourLog.getDifficulty()).isEqualTo(Difficulty.valueOf(request.getDifficulty()));
+        assertThat(tourLog.getRating()).isEqualTo(Rating.valueOf(request.getRating()));
+        assertThat(tourLog.getDistanceInMeters()).isEqualTo(request.getDistance());
+        assertThat(tourLog.getDurationInSeconds()).isEqualTo(request.getDuration());
 
-        // tourId
-        Number tourId = (Number) getFirstGetterValue(res, "getTourId");
-        if (tourId != null) assertEquals(99L, tourId.longValue());
-
-        // distance: akzeptiert getDistance() ODER getDistanceInMeters()
-        Number distance = (Number) getFirstGetterValue(res, "getDistance", "getDistanceInMeters");
-        if (distance != null) assertEquals(1234L, distance.longValue());
-
-        // duration: akzeptiert getDuration() ODER getDurationInSeconds()
-        Number duration = (Number) getFirstGetterValue(res, "getDuration", "getDurationInSeconds");
-        if (duration != null) assertEquals(5678L, duration.longValue());
+        assertThat(tourLog.getId()).isNull();
+        assertThat(tourLog.getTour()).isNull();
     }
 
-    // Prüft: fromCreateRequest setzt distance/duration (robust bzgl. Ziel-Feldern) und ignoriert id/tour.
     @Test
-    void fromCreateRequest_maps_and_ignores_fields() throws Exception {
-        TourLogCreateRequest req = new TourLogCreateRequest();
-        tryInvoke(req, "setDistance", 222L);
-        tryInvoke(req, "setDuration", 333L);
-
-        TourLog mapped = mapper.fromCreateRequest(req);
-        assertNotNull(mapped);
-
-        // distance: akzeptiert getDistanceInMeters() ODER getDistance()
-        Number distance = (Number) getFirstGetterValue(mapped, "getDistanceInMeters", "getDistance");
-        if (distance != null) assertEquals(222L, distance.longValue());
-
-        // duration: akzeptiert getDurationInSeconds() ODER getDuration()
-        Number duration = (Number) getFirstGetterValue(mapped, "getDurationInSeconds", "getDuration");
-        if (duration != null) assertEquals(333L, duration.longValue());
-
-        // id/tour null (falls vorhanden)
-        assertNull(getFirstGetterValue(mapped, "getId"));
-        assertNull(getFirstGetterValue(mapped, "getTour"));
+    void fromCreateRequest_canHandleNull() {
+        assertDoesNotThrow(() -> mapper.fromCreateRequest(null));
     }
 
-    // Prüft: fromUpdateRequest setzt distance/duration (robust) und ignoriert id/tour.
     @Test
-    void fromUpdateRequest_maps_and_ignores_fields() throws Exception {
-        TourLogUpdateRequest req = new TourLogUpdateRequest();
-        tryInvoke(req, "setDistance", 444L);
-        tryInvoke(req, "setDuration", 555L);
-
-        TourLog mapped = mapper.fromUpdateRequest(req);
-        assertNotNull(mapped);
-
-        Number distance = (Number) getFirstGetterValue(mapped, "getDistanceInMeters", "getDistance");
-        if (distance != null) assertEquals(444L, distance.longValue());
-
-        Number duration = (Number) getFirstGetterValue(mapped, "getDurationInSeconds", "getDuration");
-        if (duration != null) assertEquals(555L, duration.longValue());
-
-        assertNull(getFirstGetterValue(mapped, "getId"));
-        assertNull(getFirstGetterValue(mapped, "getTour"));
+    void fromCreateRequest_canHandleEmpty() {
+        assertDoesNotThrow(() -> mapper.fromCreateRequest(new TourLogCreateRequest()));
     }
 
-    // -------- Helpers --------
+    @Test
+    void fromUpdateRequest_canHandle() {
+        // arrange
+        TourLogUpdateRequest request = getFullTourLogUpdateRequest();
 
-    private static void tryInvoke(Object target, String setter, Object arg) throws Exception {
-        Method m = findMethod(target.getClass(), setter, arg.getClass());
-        if (m == null && arg instanceof Long l) {
-            m = findMethod(target.getClass(), setter, long.class);
-            if (m != null) { m.invoke(target, l.longValue()); return; }
-        }
-        if (m != null) m.invoke(target, arg);
+        // act
+        TourLog tourLog = mapper.fromUpdateRequest(request);
+
+        // assert
+        assertThat(tourLog).isNotNull();
+        assertThat(tourLog.getDate()).isEqualTo(request.getDate());
+        assertThat(tourLog.getComment()).isEqualTo(request.getComment());
+        assertThat(tourLog.getDifficulty()).isEqualTo(Difficulty.valueOf(request.getDifficulty()));
+        assertThat(tourLog.getRating()).isEqualTo(Rating.valueOf(request.getRating()));
+        assertThat(tourLog.getDistanceInMeters()).isEqualTo(request.getDistance());
+        assertThat(tourLog.getDurationInSeconds()).isEqualTo(request.getDuration());
+
+        assertThat(tourLog.getId()).isNull();
+        assertThat(tourLog.getTour()).isNull();
     }
 
-    private static Object getFirstGetterValue(Object target, String... getters) throws Exception {
-        for (String g : getters) {
-            Method m = findMethod(target.getClass(), g);
-            if (m != null) return m.invoke(target);
-        }
-        return null;
+    @Test
+    void fromUpdateRequest_canHandleNull() {
+        assertDoesNotThrow(() -> mapper.fromUpdateRequest(null));
     }
 
-    private static Method findMethod(Class<?> type, String name, Class<?>... params) {
-        try { return type.getMethod(name, params); }
-        catch (NoSuchMethodException e) { return null; }
+    @Test
+    void fromUpdateRequest_canHandleEmpty() {
+        assertDoesNotThrow(() -> mapper.fromUpdateRequest(new TourLogUpdateRequest()));
+    }
+
+    private TourLog getFullTourLog() {
+        return TourLog.builder()
+                .id(1L)
+                .tour(new Tour())
+                .date(LocalDate.now())
+                .comment("comment")
+                .difficulty(Difficulty.MEDIUM)
+                .rating(Rating.PERFECT)
+                .distanceInMeters(1000d)
+                .durationInSeconds(600d)
+                .build();
+    }
+
+    private TourLogCreateRequest getFullTourLogCreateRequest() {
+        return TourLogCreateRequest.builder()
+                .date(LocalDate.now())
+                .comment("comment")
+                .difficulty(Difficulty.EASY.toString())
+                .rating(Rating.PERFECT.toString())
+                .distance(1000d)
+                .duration(600d)
+                .build();
+    }
+
+    private TourLogUpdateRequest getFullTourLogUpdateRequest() {
+        return TourLogUpdateRequest.builder()
+                .date(LocalDate.now())
+                .comment("comment")
+                .difficulty(Difficulty.EASY.toString())
+                .rating(Rating.PERFECT.toString())
+                .distance(1000d)
+                .duration(600d)
+                .build();
     }
 }

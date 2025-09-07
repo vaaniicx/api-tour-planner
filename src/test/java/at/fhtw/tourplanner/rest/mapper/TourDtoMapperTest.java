@@ -1,6 +1,8 @@
 package at.fhtw.tourplanner.rest.mapper;
 
+import at.fhtw.tourplanner.core.model.Location;
 import at.fhtw.tourplanner.core.model.Tour;
+import at.fhtw.tourplanner.core.model.TransportType;
 import at.fhtw.tourplanner.rest.dto.tour.request.TourCreateRequest;
 import at.fhtw.tourplanner.rest.dto.tour.request.TourUpdateRequest;
 import at.fhtw.tourplanner.rest.dto.tour.response.TourResponse;
@@ -10,129 +12,132 @@ import org.mapstruct.factory.Mappers;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TourDtoMapperTest {
 
     private final TourDtoMapper mapper = Mappers.getMapper(TourDtoMapper.class);
 
-    // Prüft: Wenn toResponse(null) aufgerufen wird, soll null zurückkommen.
     @Test
-    void toResponse_null_returnsNull() {
-        assertNull(mapper.toResponse(null));
+    void toResponse_canHandle() {
+        // arrange
+        Tour tour = getFullTour();
+
+        // act
+        TourResponse response = mapper.toResponse(tour);
+
+        // assert
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(tour.getId());
+        assertThat(response.getName()).isEqualTo(tour.getName());
+        assertThat(response.getDescription()).isEqualTo(tour.getDescription());
+        assertThat(response.getFrom()).isEqualTo(tour.getFrom());
+        assertThat(response.getTo()).isEqualTo(tour.getTo());
+        assertThat(TransportType.valueOf(response.getTransportType())).isEqualTo(tour.getTransportType());
     }
 
-    // Prüft: Wenn fromCreateRequest(null) aufgerufen wird, soll null zurückkommen.
     @Test
-    void fromCreateRequest_null_returnsNull() {
-        assertNull(mapper.fromCreateRequest(null));
+    void toResponse_canHandleNull() {
+        assertDoesNotThrow(() -> mapper.toResponse(null));
     }
 
-    // Prüft: Wenn fromUpdateRequest(null) aufgerufen wird, soll null zurückkommen.
     @Test
-    void fromUpdateRequest_null_returnsNull() {
-        assertNull(mapper.fromUpdateRequest(null));
+    void toResponse_canHandleEmpty() {
+        assertDoesNotThrow(() -> mapper.toResponse(new Tour()));
     }
 
-    // Prüft: Name wird übernommen, distanceInMeters → distance, durationInSeconds → duration.
     @Test
-    void toResponse_maps_name_and_optionally_distance_duration() throws Exception {
-        Tour tour = new Tour();
-        // name
-        tryInvoke(tour, "setName", "Alpenpass");
-        // optional: distanceInMeters / durationInSeconds (falls vorhanden)
-        tryInvoke(tour, "setDistanceInMeters", 12345L);
-        tryInvoke(tour, "setDurationInSeconds", 6789L);
+    void fromCreateRequest_canHandle() {
+        // arrange
+        TourCreateRequest request = getFullTourCreateRequest();
 
-        TourResponse res = mapper.toResponse(tour);
-        assertNotNull(res);
-        assertEquals("Alpenpass", tryInvokeGet(res, "getName"));
+        // act
+        Tour tour = mapper.fromCreateRequest(request);
 
-        // nur prüfen, wenn Ziel-Getter existieren
-        Object distance = tryInvokeGetNullable(res, "getDistance");
-        if (distance != null) assertEquals(12345L, ((Number) distance).longValue());
+        // assert
+        assertThat(tour).isNotNull();
+        assertThat(tour.getFrom()).isEqualTo(request.getFrom());
+        assertThat(tour.getTo()).isEqualTo(request.getTo());
+        assertThat(tour.getTransportType()).isEqualTo(TransportType.valueOf(request.getTransportType()));
 
-        Object duration = tryInvokeGetNullable(res, "getDuration");
-        if (duration != null) assertEquals(6789L, ((Number) duration).longValue());
+        assertThat(tour.getId()).isNull();
+        assertThat(tour.getDistanceInMeters()).isNull();
+        assertThat(tour.getDurationInSeconds()).isNull();
+        assertThat(tour.getLogs()).isNull();
     }
 
-    // Prüft: CreateRequest setzt Name, ignoriert id, distanceInMeters, durationInSeconds, logs.
     @Test
-    void fromCreateRequest_maps_name_and_ignores_id_distance_duration_logs() throws Exception {
-        TourCreateRequest req = new TourCreateRequest();
-        tryInvoke(req, "setName", "Neue Tour");
-
-        Tour mapped = mapper.fromCreateRequest(req);
-        assertNotNull(mapped);
-        assertEquals("Neue Tour", tryInvokeGet(mapped, "getName"));
-
-        // id muss null sein (falls vorhanden)
-        Object id = tryInvokeGetNullable(mapped, "getId");
-        if (id != null) assertNull(id);
-
-        // distanceInMeters/durationInSeconds entweder null/0 (je nach Typ) → nur prüfen falls vorhanden
-        checkZeroOrNull(mapped, "getDistanceInMeters");
-        checkZeroOrNull(mapped, "getDurationInSeconds");
-
-        // logs: null oder leer
-        Object logs = tryInvokeGetNullable(mapped, "getLogs");
-        if (logs != null) {
-            if (logs instanceof Collection<?> c) assertTrue(c.isEmpty());
-        }
+    void fromCreateRequest_canHandleNull() {
+        assertDoesNotThrow(() -> mapper.fromCreateRequest(null));
     }
 
-    // Prüft: UpdateRequest setzt Name, ignoriert id, distanceInMeters, durationInSeconds, logs.
     @Test
-    void fromUpdateRequest_maps_name_and_ignores_id_distance_duration_logs() throws Exception {
-        TourUpdateRequest req = new TourUpdateRequest();
-        tryInvoke(req, "setName", "Umbenannt");
-
-        Tour mapped = mapper.fromUpdateRequest(req);
-        assertNotNull(mapped);
-        assertEquals("Umbenannt", tryInvokeGet(mapped, "getName"));
-
-        Object id = tryInvokeGetNullable(mapped, "getId");
-        if (id != null) assertNull(id);
-
-        checkZeroOrNull(mapped, "getDistanceInMeters");
-        checkZeroOrNull(mapped, "getDurationInSeconds");
-
-        Object logs = tryInvokeGetNullable(mapped, "getLogs");
-        if (logs != null) {
-            if (logs instanceof Collection<?> c) assertTrue(c.isEmpty());
-        }
+    void fromCreateRequest_canHandleEmpty() {
+        assertDoesNotThrow(() -> mapper.fromCreateRequest(new TourCreateRequest()));
     }
 
-    // ------- kleine Helfer ohne Abhängigkeiten --------
+    @Test
+    void fromUpdateRequest_canHandle() {
+        // arrange
+        TourUpdateRequest request = getFullTourUpdateRequest();
 
-    private static void tryInvoke(Object target, String setter, Object arg) throws Exception {
-        Method m = findMethod(target.getClass(), setter, arg.getClass());
-        if (m == null && arg instanceof Long l) { // primitive long fallback
-            m = findMethod(target.getClass(), setter, long.class);
-            if (m != null) { m.invoke(target, l.longValue()); return; }
-        }
-        if (m != null) m.invoke(target, arg);
+        // act
+        Tour tour = mapper.fromUpdateRequest(request);
+
+        // assert
+        assertThat(tour).isNotNull();
+        assertThat(tour.getName()).isEqualTo(request.getName());
+        assertThat(tour.getDescription()).isEqualTo(request.getDescription());
+        assertThat(tour.getFrom()).isEqualTo(request.getFrom());
+        assertThat(tour.getTo()).isEqualTo(request.getTo());
+        assertThat(tour.getTransportType()).isEqualTo(TransportType.valueOf(request.getTransportType()));
+
+        assertThat(tour.getId()).isNull();
+        assertThat(tour.getDistanceInMeters()).isNull();
+        assertThat(tour.getDurationInSeconds()).isNull();
+        assertThat(tour.getLogs()).isNull();
     }
 
-    private static Object tryInvokeGet(Object target, String getter) throws Exception {
-        Method m = findMethod(target.getClass(), getter);
-        if (m == null) fail("Missing method: " + getter + " on " + target.getClass());
-        return m.invoke(target);
+    private TourUpdateRequest getFullTourUpdateRequest() {
+        return TourUpdateRequest.builder()
+                .name("name")
+                .description("description")
+                .from(new Location(null, "from-lat", "from-lng"))
+                .to(new Location(null, "to-lat", "to-lng"))
+                .transportType(TransportType.HIKE.toString())
+                .build();
     }
 
-    private static Object tryInvokeGetNullable(Object target, String getter) throws Exception {
-        Method m = findMethod(target.getClass(), getter);
-        return (m == null) ? null : m.invoke(target);
+    private TourCreateRequest getFullTourCreateRequest() {
+        return TourCreateRequest.builder()
+                .name("name")
+                .description("description")
+                .from(new Location(null, "from-lat", "from-lng"))
+                .to(new Location(null, "to-lat", "to-lng"))
+                .transportType(TransportType.HIKE.toString())
+                .build();
     }
 
-    private static void checkZeroOrNull(Object target, String getter) throws Exception {
-        Object val = tryInvokeGetNullable(target, getter);
-        if (val == null) return; // ok
-        if (val instanceof Number n) assertEquals(0L, n.longValue());
+    @Test
+    void fromUpdateRequest_canHandleNull() {
+        assertDoesNotThrow(() -> mapper.fromUpdateRequest(null));
     }
 
-    private static Method findMethod(Class<?> type, String name, Class<?>... params) {
-        try { return type.getMethod(name, params); }
-        catch (NoSuchMethodException e) { return null; }
+    @Test
+    void fromUpdateRequest_canHandleEmpty() {
+        assertDoesNotThrow(() -> mapper.fromUpdateRequest(null));
+    }
+
+    private Tour getFullTour() {
+        return Tour.builder()
+                .name("name")
+                .description("description")
+                .from(new Location(null, "from-lat", "from-lng"))
+                .to(new Location(null, "to-lat", "to-lng"))
+                .transportType(TransportType.WALK)
+                .distanceInMeters(1000d)
+                .durationInSeconds(600d)
+                .build();
     }
 }
