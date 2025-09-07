@@ -1,11 +1,10 @@
-package at.fhtw.tourplanner.rest.it;
+package at.fhtw.tourplanner.rest.mapper;
 
 import at.fhtw.tourplanner.core.model.Tour;
 import at.fhtw.tourplanner.core.model.TourLog;
 import at.fhtw.tourplanner.rest.dto.tourlog.request.TourLogCreateRequest;
 import at.fhtw.tourplanner.rest.dto.tourlog.request.TourLogUpdateRequest;
 import at.fhtw.tourplanner.rest.dto.tourlog.response.TourLogResponse;
-import at.fhtw.tourplanner.rest.mapper.TourLogDtoMapper;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 

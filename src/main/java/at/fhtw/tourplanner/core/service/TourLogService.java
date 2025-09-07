@@ -22,18 +22,10 @@ public class TourLogService {
     private final TourRepository tourRepository;
 
     public List<TourLog> getAllLogsForTour(Long tourId) {
-        try {
-            return tourLogRepository.findByTourId(tourId);
-        } catch (Exception e) {
-            throw new EntityNotFoundException("Could not find entities by tour id: " + tourId, e);
-        }
+        return tourLogRepository.findByTourId(tourId);
     }
 
     public TourLog createLogForTour(Long tourId, TourLog tourLog) {
-        if (tourLog.getId() != null) {
-            throw new InvalidEntityException("New logs must not have an id.");
-        }
-
         Tour tour = findTourById(tourId);
 
         try {
@@ -48,16 +40,13 @@ public class TourLogService {
     }
 
     public TourLog updateLogForTour(Long tourId, TourLog tourLog) {
-        if (!tourId.equals(tourLog.getId())) {
-            throw new InvalidEntityException("Both tour and tour from tour log must have the same ID.");
-        }
-
+        Tour tour = findTourById(tourId);
         TourLog existingTourLog = findTourLogById(tourLog.getId());
 
         try {
             TourLog updatedTourLog = TourLog.builder()
                     .id(existingTourLog.getId())
-                    .tour(existingTourLog.getTour())
+                    .tour(tour)
                     .date(tourLog.getDate())
                     .comment(tourLog.getComment())
                     .difficulty(tourLog.getDifficulty())

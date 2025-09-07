@@ -70,4 +70,9 @@ public class TourRepositoryImpl implements TourRepository {
         TourEntity tourEntity = tourMapper.toEntity(tour);
         jpaTourRepository.delete(tourEntity);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaTourRepository.deleteAll();
+    }
 }

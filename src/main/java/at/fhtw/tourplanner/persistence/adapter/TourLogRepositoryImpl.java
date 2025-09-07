@@ -58,4 +58,9 @@ public class TourLogRepositoryImpl implements TourLogRepository {
     public void delete(Long id) {
         jpaTourLogRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaTourLogRepository.deleteAll();
+    }
 }

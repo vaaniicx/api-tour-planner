@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -32,39 +33,28 @@ public class TourLogController {
     @PostMapping
     public ResponseEntity<TourLogResponse> createLogForTour(@PathVariable("tourId") Long tourId,
                                                             @RequestBody TourLogCreateRequest request) {
-        try {
-            TourLog tourLogToBeCreated = tourLogDtoMapper.fromCreateRequest(request);
-
-            TourLog createdTourLog = tourLogService.createLogForTour(tourId, tourLogToBeCreated);
-            return ResponseEntity.ok(tourLogDtoMapper.toResponse(createdTourLog));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        TourLog tourLogToBeCreated = tourLogDtoMapper.fromCreateRequest(request);
+        TourLog createdTourLog = tourLogService.createLogForTour(tourId, tourLogToBeCreated);
+        return ResponseEntity
+                .created(URI.create("/api/tours/" + tourId + "/logs/" + createdTourLog.getId()))
+                .body(tourLogDtoMapper.toResponse(createdTourLog));
     }
 
     @PutMapping("/{logId}")
     public ResponseEntity<TourLogResponse> updateLogForTour(@PathVariable("tourId") Long tourId,
                                                             @PathVariable("logId") Long logId,
                                                             @RequestBody TourLogUpdateRequest request) {
-        try {
-            TourLog tourLogToBeUpdated = tourLogDtoMapper.fromUpdateRequest(request);
-            tourLogToBeUpdated.setId(logId);
+        TourLog tourLogToBeUpdated = tourLogDtoMapper.fromUpdateRequest(request);
+        tourLogToBeUpdated.setId(logId);
 
-            TourLog updatedTourLog = tourLogService.updateLogForTour(tourId, tourLogToBeUpdated);
-            return ResponseEntity.ok(tourLogDtoMapper.toResponse(updatedTourLog));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        TourLog updatedTourLog = tourLogService.updateLogForTour(tourId, tourLogToBeUpdated);
+        return ResponseEntity.ok(tourLogDtoMapper.toResponse(updatedTourLog));
     }
 
     @DeleteMapping("/{logId}")
     public ResponseEntity<Void> deleteLogForTour(@PathVariable("tourId") Long tourId,
                                                  @PathVariable("logId") Long logId) {
-        try {
-            tourLogService.deleteLogForTour(tourId, logId);
-            return ResponseEntity.ok().build();
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        tourLogService.deleteLogForTour(tourId, logId);
+        return ResponseEntity.noContent().build();
     }
 }

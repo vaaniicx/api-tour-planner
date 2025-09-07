@@ -41,10 +41,6 @@ public class TourService {
     }
 
     public Tour createTour(Tour tour) {
-        if (tour.getId() != null) {
-            throw new InvalidEntityException("New tours must not have an id.");
-        }
-
         try {
             RouteInformation routeInformation = openRouteServiceClient.getRouteInformation(tour);
             tour.setDistanceInMeters(routeInformation.getDistanceInMeters());

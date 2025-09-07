@@ -44,4 +44,9 @@ public class LocationRepositoryImpl implements LocationRepository {
     public void delete(Long id) {
         jpaLocationRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaLocationRepository.deleteAll();
+    }
 }

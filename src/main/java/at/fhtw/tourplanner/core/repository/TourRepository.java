@@ -19,4 +19,6 @@ public interface TourRepository {
     Tour update(Tour tour);
 
     void delete(Tour tour);
+
+    void deleteAll();
 }
