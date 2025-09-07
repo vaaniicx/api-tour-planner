@@ -19,7 +19,6 @@ class TourLogDtoMapperTest {
 
     private final TourLogDtoMapper mapper = Mappers.getMapper(TourLogDtoMapper.class);
 
-
     @Test
     void toResponse_canHandle() {
         // arrange
