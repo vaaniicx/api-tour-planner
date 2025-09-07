@@ -33,18 +33,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
-    @ExceptionHandler(InvalidEntityException.class)
-    public ResponseEntity<Object> handleInvalidException(InvalidEntityException ex) {
-        log.error(ex.getMessage(), ex);
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
-
-    @ExceptionHandler(ServiceRequestException.class)
-    public ResponseEntity<Object> handleServiceRequestException(ServiceRequestException ex) {
-        log.error(ex.getMessage(), ex);
-        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
-    }
-
     private ResponseEntity<Object> buildResponse(HttpStatus status, String message) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
